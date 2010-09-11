@@ -1,0 +1,1 @@
+languages = ['se-sv', 'en-us']

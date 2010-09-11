@@ -1,0 +1,10 @@
+<ul>
+    {% for key, page in pageTree.iteritems %}
+        <li>
+            <a href="/edit/?pageId={{ page.page.itemId }}">{{ page.page.name }}</a>
+            {% if page.children %}
+                {% PageTree page.children %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

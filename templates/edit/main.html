@@ -1,0 +1,32 @@
+{% extends "index.html" %}
+{% block title %} Main {% endblock %}
+
+{% block content %}
+    <div class="container_16">
+        <div class="grid_4">
+            {% PageTree pageTree %}
+        </div>
+        <div class="grid_12">
+            <h1>NewPage</h1>
+            <form action="/edit/action/AddUpdatePage" method="post">
+                <input type="hidden" name="page_sortIndex" value="0" />
+                <label for="page_name">Page name</label>
+                <input id="page_name" type="text" name="page_name" />
+                <label for="page_templateType">Template type</label>
+                <select name="page_templateType" id="page_templateType">
+                    {% for template in templateTypes %}
+                        <option value="{{ template }}">{{ template.templateName }}</option>
+                    {% endfor %}
+                </select>
+                <label for="page_parent">Page parent</label>
+                <select name="page_parent" id="page_parent">
+                    <option value="0">[Root]</option>
+                    {% for page in pages %}
+                        <option value="{{ page.itemId }}">{{ page.name }}</option>
+                    {% endfor %}
+                </select>
+                <button>[Save]</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

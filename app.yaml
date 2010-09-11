@@ -1,0 +1,14 @@
+application: tungsten-web
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /ui
+  static_dir: ui
+
+- url: /stats.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py  
+ 
+- url: .*
+  script: main.py

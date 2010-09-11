@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% block title %} Main {% endblock %}
+
+{% block content %}
+    <div class="container_16">
+        <form id="login_form" method="post" action="/edit/action/login">
+            <input name="username" />
+            <input name="password" />
+            <button>[Login]</button>
+        </form>
+    </div>
+{% endblock %}
