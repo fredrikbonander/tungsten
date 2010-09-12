@@ -18,14 +18,16 @@
 import os
 
 from google.appengine.dist import use_library
+
 use_library('django', '1.1')
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
+from PageController import EditView
 
 import Utils
-from PageController import EditView
+import cgi
 
 def render_template(file, template_vals):
     path = os.path.join(os.path.dirname(__file__), 'templates', file)
@@ -34,8 +36,8 @@ def render_template(file, template_vals):
 class EditHandler(webapp.RequestHandler):    
     def get(self, *path):
         view = Utils.dictObj()
-        
-        EditView.GetHandler(path, view)
+        query = cgi.FieldStorage()
+        EditView.GetHandler(path, view, query)
         
         self.response.out.write(render_template(view.templateFile, view))
 

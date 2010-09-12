@@ -27,6 +27,20 @@
                 </select>
                 <button>[Save]</button>
             </form>
+            {% for language in settings.languages %}
+                <form action="/edit/action/AddUpdateContent" method="post" accept-charset="utf-8">
+                    <input type="hidden" name="lang" value="{{ language }}" />
+                    <input type="hidden" name="pageKey" value="{{ pageTemplate.pageKey }}" />
+                    <label for="pageModule_name">Page name</label>
+                    <input type="text" id="page_module_name" name="page_module_name" value="{% getDictKey pageTemplate.pageModules language 'name' %}" />
+                    {% for module in pageTemplate.modules %}
+                        {% ifequal module.type "static" %}
+                            {% Module module language  %}
+                        {% endifequal %}
+                    {% endfor %}
+                    <button>[Save]</button>
+                </form>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

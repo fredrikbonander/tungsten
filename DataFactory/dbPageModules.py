@@ -11,10 +11,11 @@ class PageModules(db.Model):
     classdocs
     '''
     lang = db.StringProperty()
+    name = db.StringProperty()
     path = db.StringProperty()
     published = db.BooleanProperty(default=False)
-    parentKey = db.ReferenceProperty(dbPages.Pages)
+    pageKey = db.ReferenceProperty(dbPages.Pages)
     
     @property
-    def itemid(self):
+    def itemId(self):
         return self.key().id()

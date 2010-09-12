@@ -12,6 +12,7 @@ import Users
 import Utils
 import PageService
 import logging
+import Settings
 
 class GetHandler:
     def __init__(self, path, *args):
@@ -22,12 +23,23 @@ class GetHandler:
         else:
             func = getattr(self, self.pathList[0])
             func(*args)
-        
-    def main(self, view):
+
+    def getPageData(self, view, pageId):
+        currentPage = dbPages.Pages.get_by_id(int(pageId))
+        pageTemplateType = currentPage.templateType.split('.')[-1]
+        pageTemplate = getattr(PageTemplates, pageTemplateType, None)
+        view.pageTemplate = pageTemplate(page = currentPage)
+        view.pageTemplate.addModules()
+                
+    def main(self, view, query):
         pages = dbPages.Pages.all()
         view.pageTree = PageService.build_tree(pages)
-        logging.info(view.pageTree)
         view.pages = pages
+        view.settings = Settings        
+        
+        if query.getvalue('pageId'):
+            self.getPageData(view, query.getvalue('pageId'))
+        
         view.templateTypes = Utils.getPageTemplates(PageTemplates, PageType)
         view.templateFile = 'edit/' + self.pathList[0] + '.html'
         
@@ -50,3 +62,11 @@ class PostHandler:
         
         if view.StatusMessage['status'] < 0:
             view.redirect = '/edit/?message=' + view.StatusMessage['message']
+            
+    def AddUpdateContent(self, view, post):
+        view.StatusMessage = Page.AddUpdateContent(post)
+        view.redirect = '/edit/'
+        
+        if view.StatusMessage['status'] < 0:
+            view.redirect = '/edit/?message=' + view.StatusMessage['message']
+        

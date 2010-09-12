@@ -6,6 +6,7 @@ Created on Sep 9, 2010
 from PageService import PageTypes
 
 class StandardPage(PageTypes.PageType):
+    # Display name in EDIT/new page
     templateName = 'StandardPage'
     templateFile = 'standardpage.html'
     

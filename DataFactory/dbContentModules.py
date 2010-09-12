@@ -9,8 +9,8 @@ from DataFactory import dbPageModules
 class ContentModules(db.Model):
     name = db.StringProperty()
     content = db.TextProperty()
-    pageModule = db.ReferenceProperty(dbPageModules.PageModules)
+    pageModuleKey = db.ReferenceProperty(dbPageModules.PageModules)
     
     @property
-    def itemid(self):
+    def itemId(self):
         return self.key().id()

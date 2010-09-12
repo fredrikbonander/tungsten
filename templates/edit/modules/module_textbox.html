@@ -1,0 +1,8 @@
+<div class="modules_box">
+	<div class="top">
+		<label for="module_textbox_{{ forloop.counter }}">{{ module.name }}</label>
+	</div>
+	<div class="bottom">
+		<textarea name="{{ module.name }}|static|{{ module.itemId }}" id="module_textbox_{{ forloop.counter }}">{{ data }}</textarea>
+	</div>
+</div>
