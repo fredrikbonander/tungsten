@@ -11,6 +11,12 @@ def PageTree(pages, currentPage):
 path = os.path.join(os.path.dirname(__file__), '../templates/edit/pageTree.html')
 register.inclusion_tag(path)(PageTree)
 
+def SitePageTree(pages, currentPage):
+    return  { 'pageTree' : pages, 'currentPage': currentPage }
+
+path = os.path.join(os.path.dirname(__file__), '../templates/pages/modules/sitePageTree.html')
+register.inclusion_tag(path)(SitePageTree)
+
 def Module(module, language):
     data = ''
     if module['data'].has_key(language):

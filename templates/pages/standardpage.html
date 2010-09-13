@@ -3,6 +3,7 @@
 
 {% block content %}
     <div class="content">
-        Content
+        <h1>{{ pageContent.MainHeading }}</h1>
+        {% SitePageTree pageTree currentPage %}
     </div>
 {% endblock %}

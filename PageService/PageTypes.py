@@ -16,7 +16,6 @@ def parsePageData(data):
             for entry in data[lang]:
                 if entry.name == 'ImageList':
                     ids = entry.content.split(',')
-                    logging.info(ids)
                     if len(ids) > 0 and ids[0] != '':
                         dataAsDict[lang][entry.name] = dbImageStore.ImageStore.get_by_id([int(id) for id in ids])
                     else:

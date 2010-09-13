@@ -86,3 +86,43 @@ def AddUpdateContent(params):
                 db.put(contentModule)
     
     return { 'status' : 1, 'message' : 'Content added/updated', 'pageId' : str(page.key().id()) }
+
+def AddUpdatePageSettings(params):
+    if params.get('startpage') == "on":
+        startpage = True 
+    else: 
+        startpage = False
+    
+    if startpage:
+        pages = dbPages.Pages.all()
+        for page in pages:
+            page.startpage = False
+            page.put()
+        
+    currentPage = dbPages.Pages.get_by_id(int(params.get('page_id')))
+    currentPage.startpage = startpage
+    
+    db.put(currentPage)
+    
+    if startpage:
+        return { 'status' : 1, 'message' : 'New startpage is set', 'pageId' : params.get('page_id') }
+    else:
+        return { 'status' : -1, 'message' : 'Remember to set a page as startpage', 'pageId' : params.get('page_id') }
+    
+def DeletePage(params):
+    currentPage = dbPages.Pages.get_by_id(int(params.get('page_id')))
+    childPages = dbPages.Pages.gql('WHERE parentKey = :parentKey', parentKey = currentPage.key()).fetch(100)
+    
+    if len(childPages) == 0:
+        pageModules = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey', pageKey = currentPage.key()).fetch(100)
+        
+        for pageModule in pageModules:
+            contentModules = dbContentModules.ContentModules.gql('WHERE pageModuleKey = :pageModuleKey', pageModuleKey = pageModule.key()).fetch(100)
+            db.delete(contentModules)
+        
+        db.delete(pageModules)
+        db.delete(currentPage)
+        return { 'status' : 1, 'message' : 'Page deleted', 'pageId' : '0' }
+    else:
+        return { 'status' : -1, 'message' : 'Page has child pages, delete these first', 'pageId' : params.get('page_id') }
+    

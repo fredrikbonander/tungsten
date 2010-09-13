@@ -51,6 +51,7 @@ class GetHandler:
     def imageStore(self, view, query):
         if query.getvalue('imageId'):
             view.currentImage = dbImageStore.ImageStore.get_by_id(int(query.getvalue('imageId')))
+            view.currentImageDescription = dbImageStore.ImageDescription.gql('WHERE imageEntry = :imageEntry', imageEntry = view.currentImage.key())
         
         view.uploadUrl = blobstore.create_upload_url('/edit/action/AddUpdateImageStore')
         view.imageList = dbImageStore.ImageStore.all()
@@ -80,4 +81,15 @@ class PostHandler:
     def AddUpdateContent(self, view, post):
         view.StatusMessage = Page.AddUpdateContent(post)
         view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+     
+    def AddUpdatePageSettings(self, view, post):
+        view.StatusMessage = Page.AddUpdatePageSettings(post)
+        view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
         
+    def DeletePage(self, view, post):
+        view.StatusMessage = Page.DeletePage(post)
+        
+        if view.StatusMessage['pageId'] == '0':
+            view.redirect = '/edit/newpage/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+        else:
+            view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']

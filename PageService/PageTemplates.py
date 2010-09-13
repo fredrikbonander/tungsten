@@ -8,7 +8,7 @@ from PageService import PageTypes
 class StandardPage(PageTypes.PageType):
     # Display name in EDIT/new page
     templateName = 'StandardPage'
-    templateFile = 'standardpage.html'
+    templateFile = 'pages/standardpage.html'
     
     def addModules(self):
         self.modules.append(PageTypes.getStandardHeading(self, 'MainHeading'))

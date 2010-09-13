@@ -26,6 +26,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from PageController import EditView
+from PageController import MainView
 
 import Utils
 import cgi
@@ -50,14 +51,23 @@ class EditHandler(webapp.RequestHandler):
         self.redirect(view.redirect)
 
 class MainHandler(webapp.RequestHandler):
-    def get(self):
-        self.response.out.write(render_template('pages/main.html', {}))
+    def get(self, *path):
+        view = Utils.dictObj()
+        query = cgi.FieldStorage()
+        
+        ## Set standard language
+        if path[0] == '':
+            self.redirect('/en-us/')
+        else:    
+            MainView.GetHandler(path, view, query)
+            
+            self.response.out.write(render_template(view.pageTemplate.templateFile, view))
 
 
 def main():
     application = webapp.WSGIApplication([('/edit/action/AddUpdateImageStore', ImageStore.AddUpdateImageStore),
                                           (r'/(?i)(Edit)/(.*)', EditHandler),
-                                          ('/', MainHandler)],
+                                          (r'/(.*)', MainHandler)],
                                          debug=True)
     util.run_wsgi_app(application)
 

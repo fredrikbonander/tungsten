@@ -19,10 +19,18 @@
                             <label for="image_name">Image name</label>
                             <input id="image_name" type="text" name="image_name" value="{{ currentImage.name }}" />
                         </div>
-                        <div class="modules_box">
-                            <label for="image_description">Image description</label>
-                            <textarea id="image_description"name="image_description">{{ currentImage.description }}</textarea>
-                        </div>
+                        {% for language in settings.languages %}
+                            <div class="modules_box">
+                                <label for="image_description_{{ language }}">Image description - {{ language }}</label>
+                                {% for description in currentImageDescription %}
+                                    {% ifequal description.lang language %}
+                                        <textarea id="image_description_{{ language }}" name="image_description_{{ language }}">{{ description.description }}</textarea>
+                                    {% endifequal %}
+                                {% empty %}
+                                    <textarea id="image_description_{{ language }}" name="image_description_{{ language }}"></textarea>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
                         <div class="modules_box">
                             <label for="image_file">Image</label>
                             <input id="image_file" type="file" name="image_file" />

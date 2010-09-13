@@ -6,33 +6,40 @@
         <div class="grid_4">
             {% include "modules/leftmenu.html" %}
         </div>
-        <div class="grid_11 ui-widget ui-widget-content ui-corner-all">
+        <div class="grid_11">
             <h2>New page</h2>
-            <form action="/edit/action/AddUpdatePage" method="post">
-                <input type="hidden" name="page_sortIndex" value="0" />
-                <div class="modules_box">
-                    <label for="page_name">Page name</label>
-                    <input id="page_name" type="text" name="page_name" />
+            <div class="status_placeholder">
+                {% include "modules/statusmessages.html" %}
+            </div>
+            <div class="oh ui-widget ui-widget-content ui-corner-all">
+                <div class="grid_10">
+                    <form action="/edit/action/AddUpdatePage" method="post">
+                        <input type="hidden" name="page_sortIndex" value="0" />
+                        <div class="modules_box">
+                            <label for="page_name">Page name</label>
+                            <input id="page_name" type="text" name="page_name" />
+                        </div>
+                        <div class="modules_box">
+                            <label for="page_templateType">Template type</label>
+                            <select name="page_templateType" id="page_templateType">
+                                {% for template in templateTypes %}
+                                    <option value="{{ template }}">{{ template.templateName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modules_box">
+                            <label for="page_parent">Page parent</label>
+                            <select name="page_parent" id="page_parent">
+                                <option value="0">[Root]</option>
+                                {% for page in pages %}
+                                    <option value="{{ page.itemId }}">{{ page.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button>[Save]</button>
+                    </form>
                 </div>
-                <div class="modules_box">
-                    <label for="page_templateType">Template type</label>
-                    <select name="page_templateType" id="page_templateType">
-                        {% for template in templateTypes %}
-                            <option value="{{ template }}">{{ template.templateName }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="modules_box">
-                    <label for="page_parent">Page parent</label>
-                    <select name="page_parent" id="page_parent">
-                        <option value="0">[Root]</option>
-                        {% for page in pages %}
-                            <option value="{{ page.itemId }}">{{ page.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button>[Save]</button>
-            </form>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -1,0 +1,10 @@
+<ul>
+    {% for key, page in pageTree.iteritems %}
+        <li>
+            <a href="{{ page.path }}">{{ page.name }}</a>
+            {% if page.children %}
+                {% SitePageTree page.children currentPage %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
