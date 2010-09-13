@@ -25,6 +25,18 @@ def AddOrUpdate(params):
     
     return { 'status' : 1, 'message' : 'Page added/updated' }
 
+def GetPath(page, lang, path):
+    if page.parentKey == None:
+        return '/' + lang + '/' + path
+    else:
+        page = dbPages.Pages.get(page.parentKey.key())
+        pageModule = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey AND lang = :lang', pageKey = page.key(), lang = lang).get()
+        
+        if pageModule is None:
+            return False
+        
+        return pageModule.path + path
+
 def AddUpdateContent(params):
     args = params.arguments()
     #isModule = re.compile("^(module_)") 
@@ -38,6 +50,7 @@ def AddUpdateContent(params):
     else: 
         publish = False
     
+    page = dbPages.Pages.get(pageKey)
     pageModule = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey AND lang = :lang', pageKey = pageKey, lang = lang).get()
     
     if pageModule is None:
@@ -46,7 +59,14 @@ def AddUpdateContent(params):
         pageModule.lang = lang
         
     pageModule.name = pageModuleName
-    pageModule.path = Utils.slugify(unicode(pageModuleName))
+    stringPath = Utils.slugify(unicode(pageModuleName)) + '/'
+    path = GetPath(page, lang, stringPath)
+    
+    ## If path is False, parent page in GetPath method has not been saved.
+    if not path:
+        return { 'status' : -1, 'message' : 'Parent page is not published' }
+    
+    pageModule.path = path
     pageModule.published = publish
     
     pageModuleKey = db.put(pageModule)

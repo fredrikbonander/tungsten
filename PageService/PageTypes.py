@@ -6,6 +6,7 @@ Created on Sep 9, 2010
 from DataFactory import dbPageModules
 from DataFactory import dbContentModules
 import logging
+import Settings
 def parsePageData(data):
     dataAsDict = {}
     if data:
@@ -29,6 +30,10 @@ class PageType():
         pageModuleList = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey', pageKey = pageKey).fetch(1000)
         pageData = {}
         pageModules = {}
+        
+        for lang in Settings.languages:
+            pageModules[lang] = {}
+            
         for pageModule in pageModuleList:
             pageModules[pageModule.lang] = pageModule
             pageData[pageModule.lang] = dbContentModules.ContentModules.gql('WHERE pageModuleKey = :pageModuleKey', pageModuleKey = pageModule.key()).fetch(100)

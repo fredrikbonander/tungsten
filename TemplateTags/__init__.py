@@ -1,5 +1,5 @@
 import os
-from django.template import Node
+from django.template import Library, Node, TemplateSyntaxError
 from google.appengine.ext import webapp
 import logging
 
@@ -27,19 +27,3 @@ def ifIn(value, list):
         return False
     
 register.filter('ifIn', ifIn)
-
-class GetDictKey(Node):
-    def __init__(self, args):
-        self.args = args
-
-    def render(self, context):
-        logging.info(self.args)
-        return self.args[1][self.args[2]][self.args[3]]
-
-def getDictKey(parser, token):
-    logging.info(parser)
-    logging.info(token)
-    args = token.contents.split()
-    return GetDictKey(args)
-    
-register.tag('getDictKey', getDictKey)

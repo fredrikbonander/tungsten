@@ -32,7 +32,11 @@
                     <input type="hidden" name="lang" value="{{ language }}" />
                     <input type="hidden" name="pageKey" value="{{ pageTemplate.pageKey }}" />
                     <label for="pageModule_name">Page name</label>
-                    <input type="text" id="page_module_name" name="page_module_name" value="{% getDictKey pageTemplate.pageModules language 'name' %}" />
+                    {% for name, pageModule in pageTemplate.pageModules.iteritems %}
+                        {% ifequal name language %}
+                            <input type="text" id="page_module_name" name="page_module_name" value="{{ pageModule.name }}" />
+                        {% endifequal %}
+                    {% endfor %}
                     {% for module in pageTemplate.modules %}
                         {% ifequal module.type "static" %}
                             {% Module module language  %}
