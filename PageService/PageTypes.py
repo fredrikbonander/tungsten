@@ -3,17 +3,25 @@ Created on Sep 9, 2010
 
 @author: broken
 '''
-from DataFactory import dbPageModules
+from DataFactory import dbPageModules, dbImageStore
 from DataFactory import dbContentModules
 import logging
 import Settings
+
 def parsePageData(data):
     dataAsDict = {}
     if data:
         for lang in data:
             dataAsDict[lang] = {}
             for entry in data[lang]:
-                if entry.content is None:
+                if entry.name == 'ImageList':
+                    ids = entry.content.split(',')
+                    logging.info(ids)
+                    if len(ids) > 0 and ids[0] != '':
+                        dataAsDict[lang][entry.name] = dbImageStore.ImageStore.get_by_id([int(id) for id in ids])
+                    else:
+                        dataAsDict[lang][entry.name] = ''
+                elif entry.content is None:
                     dataAsDict[lang][entry.name] = ''
                 else:
                     dataAsDict[lang][entry.name] = entry.content
@@ -64,3 +72,12 @@ def getStandardTextBox(template, name):
             templateData[lang] = template.pageData[lang][name]
         
     return { 'name' : name, 'type' : 'static', 'file' : 'modules/module_textbox.html', 'data' : templateData }
+
+def getImageListModule(template, name):
+    templateData = {}
+    imageList = dbImageStore.ImageStore.all() 
+    for lang in template.pageData:
+        if name in template.pageData[lang]:
+            templateData[lang] = template.pageData[lang][name]
+        
+    return { 'name' : name, 'type' : 'imageList', 'file' : 'modules/module_imagelist.html', 'data' : templateData, 'imageList' : imageList }

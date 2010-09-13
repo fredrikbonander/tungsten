@@ -2,8 +2,6 @@ from DataFactory import dbPages
 from DataFactory import dbContentModules
 from DataFactory import dbPageModules
 from google.appengine.ext import db
-import logging
-import re
 import Utils
 
 def AddOrUpdate(params):
@@ -21,9 +19,9 @@ def AddOrUpdate(params):
     
     page.parentKey = parentKey
     
-    db.put(page)
+    pageKey = db.put(page)
     
-    return { 'status' : 1, 'message' : 'Page added/updated' }
+    return { 'status' : 1, 'message' : 'Page added/updated', 'pageId' : str(pageKey.id()) }
 
 def GetPath(page, lang, path):
     if page.parentKey == None:
@@ -44,9 +42,9 @@ def AddUpdateContent(params):
     pageKey = db.Key(params.get('pageKey'))
     pageModuleName = params.get('page_module_name')
     lang = params.get('lang')
-    
+        
     if params.get('publish') == "on":
-        publish =  True 
+        publish = True 
     else: 
         publish = False
     
@@ -64,7 +62,7 @@ def AddUpdateContent(params):
     
     ## If path is False, parent page in GetPath method has not been saved.
     if not path:
-        return { 'status' : -1, 'message' : 'Parent page is not published' }
+        return { 'status' : -1, 'message' : 'Parent page is not published', 'pageId' : str(page.key().id()) }
     
     pageModule.path = path
     pageModule.published = publish
@@ -74,7 +72,8 @@ def AddUpdateContent(params):
     for arg in args:
         argList = arg.split('|')
         if len(argList) > 1:
-            if argList[1] == 'static':
+            # Save only static modules
+            if argList[1] == 'static' or argList[1] == 'imageList':
                 contentModule = dbContentModules.ContentModules.gql('WHERE pageModuleKey = :pageModuleKey AND name = :name', pageModuleKey = pageModuleKey, name = argList[0]).get()
                 
                 if contentModule is None:
@@ -86,4 +85,4 @@ def AddUpdateContent(params):
                     
                 db.put(contentModule)
     
-    return { 'status' : 1, 'message' : 'Content added/updated' }
+    return { 'status' : 1, 'message' : 'Content added/updated', 'pageId' : str(page.key().id()) }

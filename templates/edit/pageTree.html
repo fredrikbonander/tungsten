@@ -1,9 +1,9 @@
 <ul>
     {% for key, page in pageTree.iteritems %}
         <li>
-            <a href="/edit/?pageId={{ page.page.itemId }}">{{ page.page.name }}</a>
+            <a href="/edit/?pageId={{ page.page.itemId }}"><span class="ui-icon {% ifequal currentPage.key page.page.key %}ui-icon-play{% else %}ui-icon-document{% endifequal %}"></span>{{ page.page.name }}</a>
             {% if page.children %}
-                {% PageTree page.children %}
+                {% PageTree page.children currentPage %}
             {% endif %}
         </li>
     {% endfor %}

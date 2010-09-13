@@ -8,17 +8,20 @@
 
 /* HTML tags
 ----------------------------------------------------------------------------------------------------*/
-html, body { background-color: #e7e4e1; height: 100%; margin: 0; padding: 0; width: 100%; }
+html, body { background-color: #f3f3f3; height: 100%; margin: 0; padding: 0; width: 100%; }
 body { background-repeat: repeat-x; color: #222; font-family: "Tahoma", Arial; font-size: 12px;}
 
-a { color: #ae1117; font-family: "Tahoma", Arial; font-size: 12px; font-weight: bold; text-decoration: none; }
+a { color: #ae1117; font-family: "Tahoma", Arial; font-size: 11px; font-weight: bold; text-decoration: none; }
 a img { border: none;}
 a:hover { text-decoration: underline; }
 a span { font-size: 10px; font-weight: normal;}
 
-input { background-color: transparent; border: 1px solid #222; color: #fff; font-size: 10px; height: 13px; padding: 5px; width: 108px; }
+input { background-color: #f3f3f3; border: 1px solid #222; color: #5c5c5c; font-size: 10px; height: 13px; padding: 5px; }
+input[type=checkbox] { position: relative; top: 2px; }
+input[type=file] { background-color: transparent; border: none; }
+textarea { background-color: #f3f3f3; border: 1px solid #222; color: #5c5c5c; }
 button { background: none; border: none; color: #5c5c5c; cursor: pointer; font-weight: bold; }
-
+button span.ui-icon { display: inline-block; height: 13px; position: relative; top: 1px; }
 h1 { font-size: 24px; font-weight: bold; margin: 12px 0; }
 h1 a { color: #222; font-size: 24px; }
 h2 { font-size: 14px; font-weight: bold; margin: 0 0 7px 0; }
@@ -27,9 +30,17 @@ h3 { font-size: 12px; font-weight: bold; margin: 0 0 6px 0; }
 h3 a { color: #222; font-size: 12px; }
 h4 { font-size: 10px; font-weight: bold; margin: 0 0 5px 0; }
 h4 a { color: #222; font-size: 10px; }
+
+ul, ul li { margin: 0; list-style: none; padding: 0; }
+
+/* CSS styles classes
+----------------------------------------------------------------------------------------------------*/
+.oh { overflow: hidden; }
+.hide { display: none: }
+
 /* Containers
 ----------------------------------------------------------------------------------------------------*/
-.container_16 { margin-left: auto; margin-right: auto; width: 960px; }
+.container_16 { margin-left: auto; margin-right: auto; padding-top: 20px; width: 960px; }
 
 /* Grid >> Global
 ----------------------------------------------------------------------------------------------------*/
@@ -60,6 +71,10 @@ h4 a { color: #222; font-size: 10px; }
 .container_16 .grid_14 { width:820px; }
 .container_16 .grid_15 { width:880px; }
 .container_16 .grid_16 { width:940px; }
+
+
+.grid_11.ui-widget { padding: 10px; }
+
 /* Prefix Extra Space >> 16 Columns
 ----------------------------------------------------------------------------------------------------*/
 .container_16 .prefix_1 { padding-left:60px; }
@@ -98,6 +113,39 @@ h4 a { color: #222; font-size: 10px; }
 /* Login form
 ----------------------------------------------------------------------------------------------------*/
 #login_form input { display: block; }
+
+/* Page tree
+----------------------------------------------------------------------------------------------------*/
+#newpage_link, #imageStore_link { cursor: pointer; padding: .4em 1em .4em 20px;text-decoration: none;position: relative;}
+#newpage_link span.ui-icon, #imageStore_link span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px;}
+.grid_4 > ul { margin-top: 10px; }
+.grid_4 > ul ul { margin-left: 10px; }
+.grid_4 ul li { margin: 2px; }
+.grid_4 ul li a { text-decoration: none; }
+.grid_4 ul li a span { display: inline-block; position: relative; top: 3px; }
+.grid_4 ul.actions li { height: 28px; }
+
+/* modules_box
+----------------------------------------------------------------------------------------------------*/
+.modules_box { margin: 5px 0; }
+.modules_box label { display: block; }
+.modules_box input { width: 350px; }
+.modules_box textarea { height: 150px; padding: 3px; width: 354px; }
+
+/* Status messages
+----------------------------------------------------------------------------------------------------*/
+.status_placeholder { margin-bottom: 5px; }
+
+/* Image Store List
+----------------------------------------------------------------------------------------------------*/
+ul.image_list li a { text-decoration: none; }
+ul.image_list li a span { display: inline-block; margin-right: 3px; position: relative; top: 3px; }
+
+.page_images { margin-top: 10px; }
+.image_list_wrapper { overflow: hidden; width: 430px; }
+.image_list_wrapper button { display: block; clear: left; margin-top: 20px; }
+.image_list_wrapper .list_area { float: left; margin: 0 20px 20px 0; width: 180px;}
+.image_list_wrapper .list_area ul { background-color: #f3f3f3; border: 1px dotted #222; min-height: 20px;  }
 
 /* Clear Floated Elements
 ----------------------------------------------------------------------------------------------------*/

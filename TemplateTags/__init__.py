@@ -5,8 +5,8 @@ import logging
 
 register = webapp.template.create_template_register()
 
-def PageTree(pages):
-    return  { 'pageTree' : pages }
+def PageTree(pages, currentPage):
+    return  { 'pageTree' : pages, 'currentPage': currentPage }
 
 path = os.path.join(os.path.dirname(__file__), '../templates/edit/pageTree.html')
 register.inclusion_tag(path)(PageTree)
@@ -15,7 +15,7 @@ def Module(module, language):
     data = ''
     if module['data'].has_key(language):
         data = module['data'][language]
-    return  { 'module' : module, 'data' : data }
+    return  { 'module' : module, 'data' : data, 'language' : language }
 
 path = os.path.join(os.path.dirname(__file__), '../templates/edit/modules/module.html')
 register.inclusion_tag(path)(Module)

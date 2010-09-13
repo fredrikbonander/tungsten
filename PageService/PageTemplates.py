@@ -13,3 +13,4 @@ class StandardPage(PageTypes.PageType):
     def addModules(self):
         self.modules.append(PageTypes.getStandardHeading(self, 'MainHeading'))
         self.modules.append(PageTypes.getStandardTextBox(self, 'MainTextBox'))
+        self.modules.append(PageTypes.getImageListModule(self, 'ImageList'))

@@ -18,6 +18,7 @@
 import os
 
 from google.appengine.dist import use_library
+import ImageStore
 
 use_library('django', '1.1')
 
@@ -54,7 +55,8 @@ class MainHandler(webapp.RequestHandler):
 
 
 def main():
-    application = webapp.WSGIApplication([(r'/(?i)(Edit)/(.*)', EditHandler),
+    application = webapp.WSGIApplication([('/edit/action/AddUpdateImageStore', ImageStore.AddUpdateImageStore),
+                                          (r'/(?i)(Edit)/(.*)', EditHandler),
                                           ('/', MainHandler)],
                                          debug=True)
     util.run_wsgi_app(application)
