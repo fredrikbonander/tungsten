@@ -35,3 +35,13 @@ class AddUpdateImageStore(blobstore_handlers.BlobstoreUploadHandler):
                 db.put(imageDescription)
     
         self.redirect('/edit/imageStore/?status=1&message=Image added/updated')
+        
+
+def DeleteImage(params):
+    image = dbImageStore.ImageStore.get_by_id(int(params.get('image_id')))
+    imageDescriptions = dbImageStore.ImageDescription.gql('WHERE imageEntry = :imageEntry', imageEntry = image.key()).fetch(10)
+    
+    db.delete(imageDescriptions)
+    db.delete(image)
+    
+    return { 'status' : 1, 'message' : 'Image removed.' }

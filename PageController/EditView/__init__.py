@@ -5,7 +5,9 @@ Created on Sep 9, 2010
 '''
 
 from google.appengine.api import blobstore
-from DataFactory import dbPages, dbImageStore
+from DataFactory import dbPages
+from DataFactory import dbImageStore
+from DataFactory import  dbUser
 from PageService import PageTemplates
 from PageService import Page
 from PageService.PageTypes import PageType
@@ -14,6 +16,8 @@ import Users
 import Utils
 import PageService
 import Settings
+import ImageStore
+import logging
 
 class GetHandler:
     def __init__(self, path, *args):
@@ -23,6 +27,8 @@ class GetHandler:
         args[0].statusMessage = args[1].getvalue('message')
         
         if not Users.isUserAuthenticated():
+            args[0].statusCode = '-1'
+            args[0].statusMessage = 'You don\' have access to this page'
             args[0].templateFile = 'edit/login.html'
         else:
             self.preparePage(*args)
@@ -30,21 +36,24 @@ class GetHandler:
             func(*args)
     
     def preparePage(self, view, query):
-        pages = dbPages.Pages.all()
+        pages = dbPages.Pages.gql('ORDER BY sortIndex').fetch(1000)
+            
         view.currentPage = None
         view.pageTree = PageService.build_tree(pages)
         view.pages = pages
         view.settings = Settings
 
-    def getPageData(self, view, pageId):
-        view.currentPage = dbPages.Pages.get_by_id(int(pageId))
-        pageTemplateType = view.currentPage.templateType.split('.')[-1]
-        pageTemplate = getattr(PageTemplates, pageTemplateType, None)
-        view.pageTemplate = pageTemplate(page = view.currentPage)
-        view.pageTemplate.addModules()
-        view.imageList = dbImageStore.ImageStore.all()
+    def getPageData(self, view):
+        if view.currentPage.templateType == 'PageService.PageTemplates.PageContainer':
+            self.pathList[0] = 'pagecontainer'
+        else:
+            pageTemplateType = view.currentPage.templateType.split('.')[-1]
+            pageTemplate = getattr(PageTemplates, pageTemplateType, None)
+            view.pageTemplate = pageTemplate(page = view.currentPage)
+            view.pageTemplate.addModules()
+            view.imageList = dbImageStore.ImageStore.all()
     
-    def newpage(self, view, query):
+    def main(self, view, query):
         view.templateTypes = Utils.getPageTemplates(PageTemplates, PageType)
         view.templateFile = 'edit/' + self.pathList[0] + '.html'
     
@@ -55,14 +64,33 @@ class GetHandler:
         
         view.uploadUrl = blobstore.create_upload_url('/edit/action/AddUpdateImageStore')
         view.imageList = dbImageStore.ImageStore.all()
-        view.templateTypes = Utils.getPageTemplates(PageTemplates, PageType)
         view.templateFile = 'edit/' + self.pathList[0] + '.html'
-        
-    def main(self, view, query):
+    
+    def users(self, view, query):
+        if Users.hasPremission(view, 3):
+            if query.getvalue('userId'):
+                view.currentUser = dbUser.User.get_by_id(int(query.getvalue('userId')))
+       
+            view.userList = dbUser.User.all()
+            view.templateFile = 'edit/' + self.pathList[0] + '.html'
+            
+            
+    def page(self, view, query):
         if query.getvalue('pageId'):
-            self.getPageData(view, query.getvalue('pageId'))
-        
+            view.currentPage = dbPages.Pages.get_by_id(int(query.getvalue('pageId')))
+            self.getPageData(view)
+        if query.getvalue('pageName'):
+            view.currentPage = dbPages.Pages.get_by_key_name(query.getvalue('pageName'))
+            self.getPageData(view)
+            
         view.templateFile = 'edit/' + self.pathList[0] + '.html'
+        
+    def logout(self, view, query):
+        Users.doLogout()
+        
+        view.statusCode = '1'
+        view.statusMessage = 'User has been logged out.'
+        view.templateFile = 'edit/login.html'
         
 class PostHandler:
     def __init__(self, path, *args):
@@ -76,20 +104,35 @@ class PostHandler:
       
     def AddUpdatePage(self, view, post):
         view.StatusMessage = Page.AddOrUpdate(post)
-        view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+        if view.StatusMessage['pageId'] == 'None':
+            view.redirect = '/edit/page/?pageName=' + view.StatusMessage['pageName'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+        else:
+            view.redirect = '/edit/page/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
             
     def AddUpdateContent(self, view, post):
         view.StatusMessage = Page.AddUpdateContent(post)
-        view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+        view.redirect = '/edit/page/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
      
     def AddUpdatePageSettings(self, view, post):
         view.StatusMessage = Page.AddUpdatePageSettings(post)
-        view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+        view.redirect = '/edit/page/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+    
+    def AddOrUpdateUser(self, view, post):
+        view.StatusMessage = Users.AddOrUpdate(post)
+        view.redirect = '/edit/users/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+    
+    def DeleteUser(self, view, post):
+        view.StatusMessage = Users.DeleteUser(post)
+        view.redirect = '/edit/users/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+   
+    def DeleteImage(self, view, post):
+        view.StatusMessage = ImageStore.DeleteImage(post) 
+        view.redirect = '/edit/imageStore/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']   
         
     def DeletePage(self, view, post):
         view.StatusMessage = Page.DeletePage(post)
         
         if view.StatusMessage['pageId'] == '0':
-            view.redirect = '/edit/newpage/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+            view.redirect = '/edit/?status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
         else:
-            view.redirect = '/edit/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']
+            view.redirect = '/edit/page/?pageId=' + view.StatusMessage['pageId'] + '&status=' + str(view.StatusMessage['status'])  + '&message=' + view.StatusMessage['message']

@@ -8,7 +8,7 @@ def doLogin(username, password):
     user = dbUser.User.gql('WHERE username = :username', username = username).get()
         
     if user is None:
-        return { 'status' : -1, 'message' : 'User doesn\'t exists' }
+        return { 'status' : -1, 'message' : 'The username or password you provided does not match our records.' }
     
     m = md5.new()
     m.update(password)
@@ -17,7 +17,7 @@ def doLogin(username, password):
     
     ## Match passed password as MD5 with dbUser password
     if user.password != passwordAsMD5:
-        return { 'status' : -1, 'message' : 'Password missmatch' }
+        return { 'status' : -1, 'message' : 'The username or password you provided does not match our records.' }
     
     session = get_current_session()
     session['user'] = { 'authenticated' : True, 'premissionLevel' : user.premissionLevel }
@@ -39,9 +39,23 @@ def isUserAuthenticated():
         return True
     else:
         return False
+
+def hasPremission(view, lvl_required):
+    session = get_current_session()
     
+    if lvl_required <= session['user']['premissionLevel']:
+        return True
+    else:
+        view.statusCode = '-1'
+        view.statusMessage = 'You don\' have access to this page!'
+        view.templateFile = 'edit/noaccess.html'
+        return False
+
 def AddOrUpdate(params):
-    if not params.get('user_id'):
+    user = None
+    if params.get('user_id'):
+        user = dbUser.User.get_by_id(int(params.get('user_id')))
+    if user is None:
         user = dbUser.User()
         
     m = md5.new()
@@ -49,10 +63,22 @@ def AddOrUpdate(params):
     
     user.username = params.get('username')
     user.password = m.hexdigest()
-    user.premissionLevel = params.get('premissionLevel')
+    user.premissionLevel = int(params.get('premission_level'))
     
     db.put(user)
     
+    return { 'status' : 1, 'message' : 'User updated.' }
     
+def DeleteUser(params):
+    user = dbUser.User.get_by_id(int(params.get('user_id')))
     
+    if user.premissionLevel == 3:
+        #Need to secure that at least on superuser remains
+        superUsers = dbUser.User.gql('WHERE premissionLevel = 3').fetch(100)
+        if len(superUsers) < 2:
+            return { 'status' : -1, 'message' : 'Can\'t remove user. At least one superuser need to remain.' }
     
+    db.delete(user)
+
+    return { 'status' : 1, 'message' : 'User removed.' }
+      

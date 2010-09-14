@@ -33,4 +33,7 @@ class User(db.Model):
     username = db.StringProperty()
     password = db.StringProperty()
     premissionLevel = db.IntegerProperty()
-        
+    
+    @property
+    def itemId(self):
+        return self.key().id()

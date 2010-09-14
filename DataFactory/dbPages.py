@@ -12,7 +12,7 @@ class Pages(db.Model):
     name = db.StringProperty()
     templateType = db.StringProperty()
     startpage = db.BooleanProperty()
-    sortIndex = db.IntegerProperty(default=0)
+    sortIndex = db.IntegerProperty()
     parentKey = db.SelfReferenceProperty()
     
     @property

@@ -5,6 +5,12 @@ Created on Sep 9, 2010
 '''
 from PageService import PageTypes
 
+class PageContainer(PageTypes.PageType):
+    templateName = 'PageContainer'
+    
+    def __init__(self):
+        pass
+
 class StandardPage(PageTypes.PageType):
     # Display name in EDIT/new page
     templateName = 'StandardPage'

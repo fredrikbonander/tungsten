@@ -12,7 +12,7 @@
             $('#tabs').tabs();
             $('button').button();
             
-            $('#newpage_link, #imageStore_link').hover(
+            $('ul.actions a').hover(
                 function() { $(this).addClass('ui-state-hover'); }, 
                 function() { $(this).removeClass('ui-state-hover'); }
             );

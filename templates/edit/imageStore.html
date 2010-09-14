@@ -35,8 +35,14 @@
                             <label for="image_file">Image</label>
                             <input id="image_file" type="file" name="image_file" />
                         </div>
-                        <button>[Save]</button>
+                        <button class="floatLeft">[Save]</button>
                     </form>
+                    {% if currentImage.itemId %}
+                        <form action="/edit/action/DeleteImage" enctype="multipart/form-data" method="post">
+                            <input type="hidden" name="image_id" value="{{ currentImage.itemId }}" />
+                            <button class="floatRight ui-state-error">[Delete]</button>
+                        </form>
+                    {% endif %}
                 </div>
                 <div class="grid_3">
                     <h2>Image list</h2>

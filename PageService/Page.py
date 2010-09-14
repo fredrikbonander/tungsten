@@ -5,30 +5,38 @@ from google.appengine.ext import db
 import Utils
 
 def AddOrUpdate(params):
-    if not params.get('page_id'):
+    if params.get('page_templateType') == 'PageService.PageTemplates.PageContainer':
+        keyName = Utils.slugify(unicode(params.get('page_name')))
+        page = dbPages.Pages(key_name=keyName)
+        page.sortIndex = 1000
+    else:
+        keyName = ''
         page = dbPages.Pages()
+        page.sortIndex = 10
         
     page.name = params.get('page_name')
     page.templateType = params.get('page_templateType')
-    page.sortIndex = int(params.get('page_sortIndex'));
     
     parentKey = None
         
-    if int(params.get('page_parent')):
-        parentKey = dbPages.Pages.get_by_id(int(params.get('page_parent'))).key()
+    if params.get('page_parent') != '0' and params.get('page_templateType') != 'PageService.PageTemplates.PageContainer':
+        parentKey = db.Key(params.get('page_parent'))
     
     page.parentKey = parentKey
     
     pageKey = db.put(page)
     
-    return { 'status' : 1, 'message' : 'Page added/updated', 'pageId' : str(pageKey.id()) }
+    return { 'status' : 1, 'message' : 'Page added/updated', 'pageId' : str(pageKey.id()), 'pageName' : keyName }
 
 def GetPath(page, lang, path):
     if page.parentKey == None:
         return '/' + lang + '/' + path
     else:
         page = dbPages.Pages.get(page.parentKey.key())
-        pageModule = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey AND lang = :lang', pageKey = page.key(), lang = lang).get()
+        if page.templateType == 'PageService.PageTemplates.PageContainer':
+            return '/' + lang + '/' + path
+        
+        pageModule = dbPageModules.PageModules.gql('WHERE published = True AND pageKey = :pageKey AND lang = :lang', pageKey = page.key(), lang = lang).get()
         
         if pageModule is None:
             return False
@@ -101,11 +109,12 @@ def AddUpdatePageSettings(params):
         
     currentPage = dbPages.Pages.get_by_id(int(params.get('page_id')))
     currentPage.startpage = startpage
+    currentPage.sortIndex = int(params.get('sort_index'))
     
     db.put(currentPage)
     
     if startpage:
-        return { 'status' : 1, 'message' : 'New startpage is set', 'pageId' : params.get('page_id') }
+        return { 'status' : 1, 'message' : 'Updated page settings.', 'pageId' : params.get('page_id') }
     else:
         return { 'status' : -1, 'message' : 'Remember to set a page as startpage', 'pageId' : params.get('page_id') }
     

@@ -22,6 +22,11 @@ class GetHandler:
         pages = dbPages.Pages.all()
         view.currentPage = None
         view.pageTree = PageService.build_tree(pages, view.lang, True)
+        
+        footerPageContainer = dbPages.Pages.get_by_key_name('footermenu')
+        footerPages = dbPages.Pages.gql('WHERE parentKey = :parentKey', parentKey = footerPageContainer.key()).fetch(100)
+        view.footerTree = PageService.build_page_container_tree(footerPages, footerPageContainer, view.lang, True)
+        
         view.pages = pages
         view.settings = Settings
         

@@ -3,9 +3,9 @@ Created on Sep 9, 2010
 
 @author: broken
 '''
-from DataFactory import dbPageModules, dbImageStore
+from DataFactory import dbPageModules
+from DataFactory import dbImageStore
 from DataFactory import dbContentModules
-import logging
 import Settings
 
 def parsePageData(data):
