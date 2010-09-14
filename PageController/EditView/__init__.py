@@ -27,8 +27,9 @@ class GetHandler:
         args[0].statusMessage = args[1].getvalue('message')
         
         if not Users.isUserAuthenticated():
-            args[0].statusCode = '-1'
-            args[0].statusMessage = 'You don\' have access to this page'
+            if not args[1].getvalue('status'):
+                args[0].statusCode = '-1'
+                args[0].statusMessage = 'You don\' have access to this page'
             args[0].templateFile = 'edit/login.html'
         else:
             self.preparePage(*args)
@@ -37,8 +38,9 @@ class GetHandler:
     
     def preparePage(self, view, query):
         pages = dbPages.Pages.gql('ORDER BY sortIndex').fetch(1000)
-            
+        view.currentUser = Users.getCurrentUser()
         view.currentPage = None
+        
         view.pageTree = PageService.build_tree(pages)
         view.pages = pages
         view.settings = Settings

@@ -1,5 +1,5 @@
 <div class="page_images">
-    <input type="hidden" name="{{ module.name }}|imageList|{{ module.itemId }}|{{ language }}" id="{{ module.name }}|imageList|{{ module.itemId }}|{{ language }}" />
+    <input type="hidden" value="{% for image in data %}{{ image.itemId}},{%endfor%}" name="{{ module.name }}|imageList|{{ module.itemId }}|{{ language }}" id="{{ module.name }}|imageList|{{ module.itemId }}|{{ language }}" />
     <h2>Image list</h2>
     <ul id="image_list_{{ language }}" class="image_list">
         {% for image in data %}

@@ -18,23 +18,44 @@
 import os
 
 from google.appengine.dist import use_library
-import ImageStore
 
 use_library('django', '1.1')
 
-from google.appengine.ext import webapp
+from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
+
 from PageController import EditView
 from PageController import MainView
+from DataFactory import dbUser
 
+import ImageStore
 import Utils
 import cgi
+import md5
 
 def render_template(file, template_vals):
     path = os.path.join(os.path.dirname(__file__), 'templates', file)
     return template.render(path, template_vals)
 
+class SetupHandler(webapp.RequestHandler):
+    def get(self):
+        users = dbUser.User.all()
+        
+        if users.count() > 0:
+            self.response.out.write('Captain says no!')
+        else:
+            user = dbUser.User()
+        
+            m = md5.new()
+            m.update('admin')
+            
+            user.username = 'admin'
+            user.password = m.hexdigest()
+            user.premissionLevel = 3
+            
+            db.put(user)
+            
 class EditHandler(webapp.RequestHandler):    
     def get(self, *path):
         view = Utils.dictObj()
@@ -65,7 +86,8 @@ class MainHandler(webapp.RequestHandler):
 
 
 def main():
-    application = webapp.WSGIApplication([('/edit/action/AddUpdateImageStore', ImageStore.AddUpdateImageStore),
+    application = webapp.WSGIApplication([('/edit/setup/', SetupHandler), 
+                                          ('/edit/action/AddUpdateImageStore', ImageStore.AddUpdateImageStore),
                                           (r'/(?i)(Edit)/(.*)', EditHandler),
                                           (r'/(.*)', MainHandler)],
                                          debug=True)

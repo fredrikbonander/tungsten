@@ -60,15 +60,17 @@
                     <div class="grid_7">
                         <form action="/edit/action/AddUpdatePageSettings" method="post" accept-charset="utf-8">
                             <input type="hidden" name="page_id" id="page_id" value="{{ currentPage.itemId }}">
-                            <div>
-                                <input type="checkbox" id="startpage" name="startpage"{% if currentPage.startpage %} checked="checked"{% endif %}/>
-                                <label for="startpage">Is startpage?</label>
-                            </div>
-                            <div>
-                                <label for="sort_index">Sort index</label>
-                                <input type="text" id="sort_index" name="sort_index" value="{{ currentPage.sortIndex }}"/>
-                                
-                            </div>
+                            <ul class="page_settings">
+                                <li>
+                                    <input type="checkbox" id="startpage" name="startpage"{% if currentPage.startpage %} checked="checked"{% endif %}/>
+                                    <label for="startpage">Is startpage?</label>
+                                </li>
+                                <li>
+                                    <label for="sort_index">Sort index</label>
+                                    <input type="text" id="sort_index" name="sort_index" value="{{ currentPage.sortIndex }}"/>
+                                    
+                                </li>
+                            </ul>
                             <button>[Save]</button>
                         </form>
                     </div>

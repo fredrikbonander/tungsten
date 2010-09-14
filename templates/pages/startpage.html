@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+{% block title %} Main {% endblock %}
+
+{% block content %}
+    <div class="content">
+        {% include "modules/topmenu.html" %}
+        <div class="container_10">
+            <div class="grid_10 image_holder">
+            {% for image in pageContent.ImageList %}
+                <img src="{{ image.imageUrl }}=s720" />
+            {% endfor %}
+            </div>
+            <div class="grid_4">
+                <h1>{{ pageContent.MainHeading }}</h1>
+                <h2>{{ pageContent.SubHeading }}</h2>
+            </div>
+            <div class="grid_6">
+                <p>{{ pageContent.MainTextBox }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

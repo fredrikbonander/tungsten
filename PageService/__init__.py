@@ -2,11 +2,18 @@ from DataFactory import dbPages
 from DataFactory import dbPageModules
 import logging
 
-def build_tree(nodes, *args):
+def build_tree(nodes, **kwargs):
     # create empty tree to fill
     t = {}
+    pageTree = {}
+    # Main View is for tree show on main page not edit mode
+    pageModules = False
+    if 'pageModules' in kwargs:
+        pageModules = kwargs['pageModules']
+        
     # First group all pages w/ same parent
     for node in nodes:
+        # Where parentKey is None, this tells us that node is a root level node
         if node.parentKey is None:
             key = 'root'
         else:
@@ -14,24 +21,34 @@ def build_tree(nodes, *args):
             
         if not t.has_key(key):
             t[key] = []
-        
-        t[key].append({ 'page' : node, 'children' : []})
+            
+        # If pagemodules are present, we need to store them along side the page object
+        # to display proper menu and paths i main view
+        if pageModules:
+            # TODO: Shouldn't need to loop for every node
+            for pageModule in pageModules:
+                if pageModule.pageKey.key() == node.key():
+                    t[key].append({ 'page' : node, 'pageModule' : pageModule, 'children' : []})
+        else:
+            t[key].append({ 'page' : node, 'children' : []})
     
-    logging.info(t)
-    pageTree = t['root']
+    if 'pageRoot' in kwargs:
+        pageRoot = kwargs['pageRoot']
+        pageTree = [{ 'page' : pageRoot, 'children' : []}]
+    else:
+        if t.has_key('root'):
+            pageTree = t['root']
     # Iterate over there
+    
     build_page_tree(pageTree, t)
-    
-    #build_tree_recursive(tree, None, nodes, *args)
-    
+        
     return pageTree
 
 def build_page_tree(pageTree, nodes):
     #Loop over selected list
     for parent, node in nodes.iteritems():
-        # We don't need to loop over first level node
+        # We don't need to loop over the root level node
         if parent is not 'root':
-            logging.info(node)
             # Loop over current level in page tree
             for item in pageTree:
                 # Match keys

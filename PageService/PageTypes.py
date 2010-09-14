@@ -7,17 +7,21 @@ from DataFactory import dbPageModules
 from DataFactory import dbImageStore
 from DataFactory import dbContentModules
 import Settings
-
+# Parse page data so it can be reached in django templates based on name
 def parsePageData(data):
     dataAsDict = {}
     if data:
+        # Split data between lang dicts
         for lang in data:
             dataAsDict[lang] = {}
             for entry in data[lang]:
+                # If entry is a ImageList slit content (containing ids) and get them from the datastore 
                 if entry.name == 'ImageList':
                     ids = entry.content.split(',')
+                    # Check if any ids is present
                     if len(ids) > 0 and ids[0] != '':
-                        dataAsDict[lang][entry.name] = dbImageStore.ImageStore.get_by_id([int(id) for id in ids])
+                        # Generator contains failsafe for entry.contents looking like "1,2,"
+                        dataAsDict[lang][entry.name] = dbImageStore.ImageStore.get_by_id([int(id) for id in ids if id != ''])
                     else:
                         dataAsDict[lang][entry.name] = ''
                 elif entry.content is None:
@@ -29,22 +33,25 @@ def parsePageData(data):
 
 class PageType():
     def __init__(self, **kwargs):
-        #db.get([DataFactory.dbPages.Pages.get_value_for_datastore(cartItem) for cartItem in cartItemsData ])
-        #page = DataFactory.dbPages.Pages.get_by_id(int(kwargs['pageId']))
+        # Get page from kwargs
         page = kwargs['page']
+        # Set reference to page.key() 
         pageKey = page.key()
-        
+        # Get pageModules associated with page
         pageModuleList = dbPageModules.PageModules.gql('WHERE pageKey = :pageKey', pageKey = pageKey).fetch(1000)
         pageData = {}
         pageModules = {}
-        
+        # Set up pageModules dict with lang as keys
         for lang in Settings.languages:
             pageModules[lang] = {}
-            
+        
         for pageModule in pageModuleList:
             pageModules[pageModule.lang] = pageModule
+            # All content data in store in dbContentModules.ContentModules and not in the pageModules them self
+            # Get dbContentModules.ContentModules for pageModule
             pageData[pageModule.lang] = dbContentModules.ContentModules.gql('WHERE pageModuleKey = :pageModuleKey', pageModuleKey = pageModule.key()).fetch(100)
         
+        # Store all data 
         self.pageModules = pageModules
         self.pageKey = pageKey
         self.pageData = parsePageData(pageData)

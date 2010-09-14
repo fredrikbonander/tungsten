@@ -47,7 +47,7 @@ def hasPremission(view, lvl_required):
         return True
     else:
         view.statusCode = '-1'
-        view.statusMessage = 'You don\' have access to this page!'
+        view.statusMessage = 'You don\'t have access to this page!'
         view.templateFile = 'edit/noaccess.html'
         return False
 
@@ -68,7 +68,11 @@ def AddOrUpdate(params):
     db.put(user)
     
     return { 'status' : 1, 'message' : 'User updated.' }
-    
+
+def getCurrentUser():
+    session = get_current_session()
+    return session
+  
 def DeleteUser(params):
     user = dbUser.User.get_by_id(int(params.get('user_id')))
     
@@ -81,4 +85,3 @@ def DeleteUser(params):
     db.delete(user)
 
     return { 'status' : 1, 'message' : 'User removed.' }
-      
